@@ -28,11 +28,9 @@ def apply_kerning(text_curve: bpy.types.TextCurve, font_path):
 
 
 class TextObjectAutoKerning(bpy.types.Operator):
-    """
-    Apply font-defined kerning to text object
-    """
+    """Apply font-defined kerning to text object"""
     bl_idname = 'object.auto_kerning'
-    bl_label = 'Apply Auto-Kerning'
+    bl_label = 'Apply Kerning'
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):

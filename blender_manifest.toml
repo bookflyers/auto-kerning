@@ -25,6 +25,7 @@ files = "Read font files"
 paths_exclude_pattern = [
   "/.git/",
   "__pycache__/",
+  "images/",
   ".*",
   "*.blend",
   "*.md",

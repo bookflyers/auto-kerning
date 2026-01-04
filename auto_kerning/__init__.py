@@ -3,12 +3,6 @@ from fontTools.ttLib import TTFont
 
 from .reader import OTFKernReader
 
-bl_info = {
-    'name': 'Auto Kerning',
-    'blender': (4, 2, 0),
-    'category': 'Object',
-}
-
 BLENDER_KERN_UNITS_PER_CHARACTER = 40
 
 

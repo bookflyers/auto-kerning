@@ -16,8 +16,7 @@ class FontKernInfo:
         self.font = TTFont(font_path)
         self.kerningPairs = OTFKernReader(self.font).kerningPairs
         self.cmap = self.font.getBestCmap()
-        self.s = self.font.getGlyphSet()
-        self.upm = self.font['head'].unitsPerEm
+        self.gs = self.font.getGlyphSet()
 
     def cmap_lookup(self, c: str):
         return self.cmap.get(ord(c))
@@ -25,11 +24,10 @@ class FontKernInfo:
     def calc_kerning(self, c1: str, c2: str):
         c = self.cmap_lookup(c1)
         k = self.kerningPairs.get((c, self.cmap_lookup(c2)))
-        if k is None or c not in self.s:
+        if k is None or c not in self.gs:
             return None
 
-        c_w = self.s[c].width / self.upm
-        return k * BLENDER_KERN_UNITS_PER_CHARACTER / (self.upm * c_w)
+        return k * BLENDER_KERN_UNITS_PER_CHARACTER / self.gs[c].width
 
     @classmethod
     def from_path(cls, path: str) -> Optional['FontKernInfo']:

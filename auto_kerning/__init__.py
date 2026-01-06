@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 import bpy
@@ -6,6 +7,7 @@ from fontTools.ttLib import TTFont
 from .reader import OTFKernReader
 
 BLENDER_KERN_UNITS_PER_CHARACTER = 40
+SUPPORTED_FILE_EXTS = {'.otf', '.ttf'}
 
 
 class FontKernInfo:
@@ -23,11 +25,19 @@ class FontKernInfo:
     def calc_kerning(self, c1: str, c2: str):
         c = self.cmap_lookup(c1)
         k = self.kerningPairs.get((c, self.cmap_lookup(c2)))
-        if k is None:
+        if k is None or c not in self.s:
             return None
 
-        c_w = self.s.get(c).width / self.upm if c in self.s else 1  # characters like \n do not have a glyph
+        c_w = self.s[c].width / self.upm
         return k * BLENDER_KERN_UNITS_PER_CHARACTER / (self.upm * c_w)
+
+    @classmethod
+    def from_path(cls, path: str) -> Optional['FontKernInfo']:
+        if path is not None \
+                and os.path.exists(path) \
+                and os.path.splitext(path)[-1].lower() in SUPPORTED_FILE_EXTS:
+            return cls(path)
+        return None
 
 
 def apply_kerning(
@@ -44,10 +54,10 @@ def apply_kerning(
     :param font_italic_path:
     :param font_bold_italic_path:
     """
-    info_regular = FontKernInfo(font_path)
-    info_bold = FontKernInfo(font_bold_path) if font_bold_path else None
-    info_italic = FontKernInfo(font_italic_path) if font_italic_path else None
-    info_bold_italic = FontKernInfo(font_bold_italic_path) if font_bold_italic_path else None
+    info_regular = FontKernInfo.from_path(font_path)
+    info_bold = FontKernInfo.from_path(font_bold_path)
+    info_italic = FontKernInfo.from_path(font_italic_path)
+    info_bold_italic = FontKernInfo.from_path(font_bold_italic_path)
 
     for i in range(len(text_curve.body) - 1):
         if text_curve.body_format[i].use_bold and text_curve.body_format[i].use_italic:
@@ -58,6 +68,9 @@ def apply_kerning(
             info = info_italic
         else:
             info = info_regular
+
+        if not info:
+            continue
 
         c1, c2 = text_curve.body[i], text_curve.body[i + 1]
         k = info.calc_kerning(c1, c2)

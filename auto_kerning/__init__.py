@@ -86,10 +86,10 @@ class TextObjectAutoKerning(bpy.types.Operator):
         text_curve = context.active_object.data
         apply_kerning(
             text_curve,
-            text_curve.font.filepath,
-            text_curve.font_bold.filepath,
-            text_curve.font_italic.filepath,
-            text_curve.font_bold_italic.filepath,
+            bpy.path.abspath(text_curve.font.filepath),
+            bpy.path.abspath(text_curve.font_bold.filepath),
+            bpy.path.abspath(text_curve.font_italic.filepath),
+            bpy.path.abspath(text_curve.font_bold_italic.filepath),
         )
 
         return {'FINISHED'}
